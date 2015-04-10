@@ -120,7 +120,7 @@ public class BlobTypeDescriptor extends AbstractTypeDescriptor<Blob> {
 
 		if ( BinaryStream.class.isAssignableFrom( type ) ) {
 			try {
-				return (X) new BinaryStreamImpl( DataHelper.extractBytes( value.getBinaryStream() ) );
+				return (X) new BlobProxy.StreamBackedBinaryStream( value.getBinaryStream(), value.length() );
 			}
 			catch ( SQLException e ) {
 				throw new HibernateException( "Unable to access blob stream", e );

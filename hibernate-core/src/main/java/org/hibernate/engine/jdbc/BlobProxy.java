@@ -31,6 +31,7 @@ import java.sql.SQLException;
 import java.io.InputStream;
 import java.io.IOException;
 
+import org.hibernate.type.descriptor.BinaryStream;
 import org.hibernate.type.descriptor.java.BinaryStreamImpl;
 import org.hibernate.type.descriptor.java.DataHelper;
 
@@ -197,5 +198,35 @@ public class BlobProxy implements InvocationHandler {
 			cl = BlobImplementer.class.getClassLoader();
 		}
 		return cl;
+	}
+
+	public static class StreamBackedBinaryStream implements BinaryStream {
+		private final InputStream stream;
+		private final long length;
+
+		private byte[] bytes;
+
+		public StreamBackedBinaryStream(InputStream stream, long length) {
+			this.stream = stream;
+			this.length = length;
+		}
+
+		@Override
+		public InputStream getInputStream() {
+			return stream;
+		}
+
+		@Override
+		public byte[] getBytes() {
+			if ( bytes == null ) {
+				bytes = DataHelper.extractBytes( stream );
+			}
+			return bytes;
+		}
+
+		@Override
+		public int getLength() {
+			return (int) length;
+		}
 	}
 }
